@@ -4,7 +4,7 @@ Pipeline para extração, transformação e carga (ETL) de dados geoespaciais de
 
 ##  Pré-requisitos
 - **Docker e Docker Compose** (para o banco de dados).
-- **Python 3.8+** (para execução do script).
+- **Python 3.10+** (para execução do script).
 - **Bibliotecas Python**: Instaladas via `requirements.txt`.
 
 ## Configuração
