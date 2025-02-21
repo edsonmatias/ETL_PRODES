@@ -18,7 +18,10 @@ docker-compose up -d
 docker ps -a | grep postgis_container
 ```
 ### 2. Instalar dependências
+```
 pip install -r requirements.txt
-
+```
 ### 3. execução
+```
 python main.py
+```
