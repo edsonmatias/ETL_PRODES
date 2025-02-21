@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  postgis:
+    image: postgis/postgis:15-3.3
+    container_name: postgis_container
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin2k25
+      POSTGRES_DB: geodb
+    ports:
+      - "15432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+
+volumes:
+  postgres_data:
