@@ -2,12 +2,12 @@
 
 Pipeline para extração, transformação e carga (ETL) de dados geoespaciais de desmatamento do TerraBrasilis.
 
-## 📋 Pré-requisitos
+##  Pré-requisitos
 - **Docker e Docker Compose** (para o banco de dados).
 - **Python 3.8+** (para execução do script).
 - **Bibliotecas Python**: Instaladas via `requirements.txt`.
 
-## 🚀 Configuração
+## Configuração
 
 ### 1. Banco de Dados (PostgreSQL/PostGIS)
 ```bash
