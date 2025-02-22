@@ -14,8 +14,7 @@ def convert_feature_to_gdf(feature):
     """
     Converte uma feature WFS para um GeoDataFrame, garantindo que contenha apenas as colunas especificadas.
 
-    :param feature: Dicionário contendo a feature com geometria e atributos.
-    :return: GeoDataFrame contendo a feature convertida e padronizada.
+    Retorna : GeoDataFrame contendo a feature convertida e padronizada.
     """
     # Colunas esperadas no GeoDataFrame
     expected_columns = [
@@ -66,7 +65,7 @@ def convert_feature_to_gdf(feature):
         
         gdf['id'] = feature["id"]
 
-        # Garantir que a coluna 'geom' seja uma cópia de 'geometry'
+        gdf = gdf[['id']+expected_columns]
         if 'geometry' in gdf.columns and 'geom' not in gdf.columns:
             gdf['geom'] = gdf['geometry']
 
@@ -81,8 +80,7 @@ def validate_and_fix_geometry(gdf):
     """
     Valida e corrige geometrias inválidas em um GeoDataFrame.
     
-    :param gdf: GeoDataFrame contendo a geometria a ser validada.
-    :return: GeoDataFrame corrigido ou None se a geometria continuar inválida.
+    Retorna: GeoDataFrame corrigido ou None se a geometria continuar inválida.
     """
     try:
         # Aplicar make_valid para corrigir geometrias inválidas

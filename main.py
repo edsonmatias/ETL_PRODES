@@ -13,7 +13,7 @@ import pandas as pd
 
 
 class DeforestationProcessor:
-    def __init__(self, workspace, layer, year_start, year_end, source_none='cerrado'):
+    def __init__(self, workspace, layer, year_start, year_end, source_none):
         """
         Inicializa o processador de dados de desmatamento.
 
@@ -46,7 +46,7 @@ class DeforestationProcessor:
             if gdfs_validos:
                 print('Subindo dado no BD...')
                 gdf_final = pd.concat(gdfs_validos, ignore_index=True)
-                upload_gdf_to_post(gdf_final, 'desmatamento', schema="raw_data")  # Upload único
+                upload_gdf_to_post(gdf_final, 'desmatamento', schema="raw_data")  # Upload único das features validadas
                 print('Upload completo!')
             else:
                 print('Nenhum dado válido para upload.')
@@ -54,9 +54,6 @@ class DeforestationProcessor:
     def _process_features(self, dict_geo):
         """
         Processa as features do GeoJSON, convertendo e validando as geometrias.
-
-        :param dict_geo: Dicionário contendo as features do GeoJSON
-        :return: Lista de GeoDataFrames válidos
         """
         gdfs_validos = []
         for feat in tqdm(dict_geo, desc="Convertendo e Validando Geometrias"):
@@ -66,7 +63,7 @@ class DeforestationProcessor:
                 gdf = validate_and_fix_geometry(gdf)  # Valida e tenta corrigir a geometria
 
                 if gdf is not None:  # Se a validação e correção funcionaram
-                    gdf["source"] = gdf["source"].fillna(self.source_none)  # Preenche valores ausentes
+                    gdf["source"] = source_none  # Preenche valores com o source correspondente
                     gdfs_validos.append(gdf)  # Adiciona à lista de GDFs válidos
                 else:
                     print('Geometria inválida, não foi possível a correção')
@@ -76,14 +73,14 @@ class DeforestationProcessor:
         return gdfs_validos
 
 #%%
-# Configurações iniciais
-workspace = "prodes-pampa-nb"
+# Configurações iniciais/Filtros
+workspace = "prodes-cerrado-nb"
 layer = "yearly_deforestation"
 year_start = 2000
 year_end = 2024
-source_none = 'pampa'
+source_none = 'cerrado' #Para evitar despadronização e categorizar os dados
 
-# Cria uma instância do processador
+# Cria uma instância
 processor = DeforestationProcessor(workspace, layer, year_start, year_end, source_none)
 
 # Processa os dados e faz o upload

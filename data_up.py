@@ -6,39 +6,51 @@ Created on Thu Feb 20 23:39:58 2025
 """
 
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
+# Configuração de Conexão com o BD
 db_connection_string = "postgresql+psycopg2://admin:admin2k25@localhost:15432/geodb"
 
-def upload_gdf_to_post(gdf, table_name, schema="public"):
+def upload_gdf_to_post(gdf, table_name, schema="raw_data"):
     """
-    Envia um GeoDataFrame para uma tabela no PostgreSQL/PostGIS.
-
-    :param gdf: GeoDataFrame contendo as informações a serem inseridas
-    :param table_name: Nome da tabela no PostgreSQL
-    :param db_connection_string: String de conexão com o banco de dados
-    :param schema: Schema onde a tabela será criada (padrão: public)
+    Envia um GeoDataFrame para uma tabela no PostgreSQL/PostGIS, evitando duplicatas.
     """
-
+    
     # Converter a geometria para WKT (Well-Known Text)
     gdf["geom"] = gdf["geometry"].apply(lambda geom: geom.wkt)
-
-    # Remover a coluna original de geometria
     gdf = gdf.drop(columns=["geometry"])
-
-    # Criar conexão com o banco
-    engine = create_engine(db_connection_string)
-
-    # Subir para o banco de dados via to_sql
-    with engine.begin() as connection:
-        # Subir para o banco de dados via to_sql
-        gdf.to_sql(
-            table_name,
-            con=connection,
-            schema=schema,
-            if_exists="append",
-            index=False
-        )
     
+    # Transformar em dicionário de registros
+    data = gdf.to_dict(orient='records')
+    
+    # Query de inserção ignorando duplicatas
+    insert_query = text(f"""
+        INSERT INTO {schema}.{table_name} (id, uid, state, path_row, def_cloud, julian_day, image_date, year, area_km, scene_id, source, satellite, sensor, publish_year, geom)
+        SELECT 
+            :id, 
+            :uid, 
+            :state, 
+            :path_row, 
+            :def_cloud, 
+            :julian_day, 
+            :image_date, 
+            :year, 
+            :area_km, 
+            :scene_id, 
+            :source, 
+            :satellite, 
+            :sensor, 
+            :publish_year, 
+            ST_GeomFromText(:geom, 4326)
+        WHERE NOT EXISTS (
+            SELECT 1 FROM {schema}.{table_name} 
+            WHERE id = :id
+        )
+    """)
+    
+    # Conectar e executar inserções
+    engine = create_engine(db_connection_string)
+    with engine.begin() as conn:
+        conn.execute(insert_query, data)
 
 
