@@ -76,7 +76,7 @@ class DeforestationProcessor:
 # Configurações iniciais/Filtros
 workspace = "prodes-cerrado-nb"
 layer = "yearly_deforestation"
-year_start = 2000
+year_start = 2020
 year_end = 2024
 source_none = 'cerrado' #Para evitar despadronização e categorizar os dados
 
